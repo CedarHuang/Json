@@ -1,0 +1,5 @@
+.DS_Store
+*.gch
+*.cpp
+*.o
+a.out
