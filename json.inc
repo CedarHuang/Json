@@ -34,7 +34,6 @@ json_key &json_key::operator=(const json_key &other) {
     }
     return *this;
 }
-
 json_key &json_key::operator=(json_key &&other) {
     change_type(other.t_);
     switch (t_) {
@@ -155,7 +154,6 @@ json &json::operator=(const json &other) {
     }
     return *this;
 }
-
 json &json::operator=(json &&other) {
     change_type(other.t_);
     switch (t_) {
@@ -225,7 +223,6 @@ json &json::at(const json_key &key) {
     }
     throw json_exception("非 Vector 或 Map 状态无法使用 at().");
 }
-
 const json &json::at(const json_key &key) const {
     switch (t_) {
         case VECTOR:
@@ -308,7 +305,6 @@ void json::push_back(const json &value) {
     }
     m_[json_key(m_.size())] = value;
 }
-
 void json::push_back(json &&value) {
     if (t_ == NONE) {
         t_ = VECTOR;
@@ -337,6 +333,8 @@ void json::erase(const json_key &key) {
 }
 
 void json::clear() { change_type(NONE); }
+
+ITERATOR(DEFINE);
 
 json json::parse(const std::string &json_str) {
     std::stringstream ss(json_str);

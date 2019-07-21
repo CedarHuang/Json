@@ -7,6 +7,8 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include "iterator_macro.h"
+
 namespace cedar {
 
 struct json_exception final : std::exception {
@@ -115,28 +117,7 @@ struct json final {
     using reverse_iterator = std::map<json_key, json>::reverse_iterator;
     using const_reverse_iterator = std::map<json_key, json>::const_reverse_iterator;
 
-#define DEFINE_ITERATOR          \
-    DEFINE_ITERATOR_FOR_TYPE(, ) \
-    DEFINE_ITERATOR_FOR_TYPE(reverse_, r)
-
-#define DEFINE_ITERATOR_FOR_TYPE(type, name)           \
-    DEFINE_ITERATOR_GROUP(type##iterator, name##begin) \
-    DEFINE_ITERATOR_GROUP(type##iterator, name##end)
-
-#define DEFINE_ITERATOR_GROUP(type, name)           \
-    DEFINE_ITERATOR_ITEM(type, name, )              \
-    DEFINE_ITERATOR_ITEM(const_##type, name, const) \
-    DEFINE_ITERATOR_ITEM(const_##type, c##name, const)
-
-#define DEFINE_ITERATOR_ITEM(type, name, limit)                                 \
-    type name() limit {                                                         \
-        if (t_ != VECTOR && t_ != MAP) {                                        \
-            throw json_exception("非 VECTOR 或 MAP 状态无法调用 " #name "()."); \
-        }                                                                       \
-        return m_.name();                                                       \
-    }
-
-    DEFINE_ITERATOR
+    ITERATOR(DECLARE);
 
     static json parse(const std::string &json_str);
 
