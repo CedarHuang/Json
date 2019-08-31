@@ -31,10 +31,10 @@ struct json_key final {
 
     json_key(const json_key &other);
     json_key(json_key &&other);
+
     ~json_key();
 
     json_key &operator=(const json_key &other);
-
     json_key &operator=(json_key &&other);
 
     bool operator<(const json_key &other) const;
@@ -93,19 +93,19 @@ struct json final {
     ~json();
 
     json &operator=(const json &other);
-
     json &operator=(json &&other);
 
     json &operator[](const json_key &key);
 
     json &at(const json_key &key);
-
     const json &at(const json_key &key) const;
 
     operator std::string() const;
 
-    void push_back(const json &value);
+    template <class T = std::string>
+    T cast();
 
+    void push_back(const json &value);
     void push_back(json &&value);
 
     void erase(const json_key &key);
@@ -117,7 +117,7 @@ struct json final {
     using reverse_iterator = std::map<json_key, json>::reverse_iterator;
     using const_reverse_iterator = std::map<json_key, json>::const_reverse_iterator;
 
-    ITERATOR(DECLARE);
+    ITERATOR(DECLARE)
 
     static json parse(const std::string &json_str);
 
@@ -128,8 +128,8 @@ struct json final {
         INTEGRAL = 4,
         DOUBLE = 8,
         STRING = 16,
-        VECTOR = 32,
-        MAP = 64
+        ARRAY = 32,
+        OBJECT = 64
     } t_;
     union {
         long long i_;
@@ -145,6 +145,9 @@ struct json final {
     void destructor();
 
     void change_type(decltype(t_) t);
+
+    template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type * = nullptr>
+    Int cast_int();
 
     static json parse_array(const std::string &s, size_t begin, size_t end);
 

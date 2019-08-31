@@ -17,6 +17,7 @@ json_key::json_key(std::string &&s) : t_(STRING) { new (&s_) std::string(std::mo
 
 json_key::json_key(const json_key &other) : t_(NONE) { *this = other; }
 json_key::json_key(json_key &&other) : t_(NONE) { *this = std::move(other); }
+
 json_key::~json_key() { destructor(); }
 
 json_key &json_key::operator=(const json_key &other) {
@@ -69,7 +70,7 @@ bool json_key::operator<(const json_key &other) const {
 
 json_key::operator std::string() const {
     if (t_ == NONE) {
-        throw json_exception("无法将 None 状态下的 json_key 转化为 std::string.");
+        throw json_exception("无法将 Null 状态下的 json_key 转化为 std::string.");
     }
     std::string s;
     s += t_ == STRING ? "\"" : "";
@@ -121,8 +122,8 @@ json::json(const std::string &s) : t_(STRING) { new (&s_) std::string(s); }
 json::json(std::string &&s) : t_(STRING) { new (&s_) std::string(std::move(s)); }
 
 json::json(const json_null *) : t_(NONE) {}
-json::json(const json_array *) : t_(VECTOR) { constructor(); }
-json::json(const json_object *) : t_(MAP) { constructor(); }
+json::json(const json_array *) : t_(ARRAY) { constructor(); }
+json::json(const json_object *) : t_(OBJECT) { constructor(); }
 
 json::json(const json &other) : t_(NONE) { *this = other; }
 json::json(json &&other) : t_(NONE) { *this = std::move(other); }
@@ -145,8 +146,8 @@ json &json::operator=(const json &other) {
             s_ = other.s_;
             break;
 
-        case VECTOR:
-        case MAP:
+        case ARRAY:
+        case OBJECT:
             m_ = other.m_;
             break;
 
@@ -170,8 +171,8 @@ json &json::operator=(json &&other) {
             s_ = std::move(other.s_);
             break;
 
-        case VECTOR:
-        case MAP:
+        case ARRAY:
+        case OBJECT:
             m_ = std::move(other.m_);
             break;
 
@@ -183,62 +184,62 @@ json &json::operator=(json &&other) {
 
 json &json::operator[](const json_key &key) {
     if (t_ == NONE) {
-        t_ = key.t_ == key.INTEGRAL ? VECTOR : MAP;
+        t_ = key.t_ == key.INTEGRAL ? ARRAY : OBJECT;
         constructor();
     }
     switch (t_) {
-        case VECTOR:
+        case ARRAY:
             if (key.t_ != key.INTEGRAL) {
-                throw json_exception("Vector 状态下只能使用整数型 json_key.");
+                throw json_exception("Array 状态下只能使用整数型 json_key.");
             }
             if (static_cast<size_t>(key.i_) > m_.size()) {
                 throw json_exception("只能按序创造元素.");
             }
             return m_[key];
-        case MAP:
+        case OBJECT:
             if (key.t_ != key.STRING) {
-                throw json_exception("Map 状态下只能使用字符串型 json_key.");
+                throw json_exception("Object 状态下只能使用字符串型 json_key.");
             }
             return m_[key];
 
         default:;
     }
-    throw json_exception("非 Vector 或 Map 状态无法使用 operator[].");
+    throw json_exception("非 Array 或 Object 状态无法使用 operator[].");
 }
 
 json &json::at(const json_key &key) {
     switch (t_) {
-        case VECTOR:
+        case ARRAY:
             if (key.t_ != key.INTEGRAL) {
-                throw json_exception("Vector 状态下只能使用整数型 json_key.");
+                throw json_exception("Array 状态下只能使用整数型 json_key.");
             }
             return m_.at(key);
-        case MAP:
+        case OBJECT:
             if (key.t_ != key.STRING) {
-                throw json_exception("Map 状态下只能使用字符串型 json_key.");
+                throw json_exception("Object 状态下只能使用字符串型 json_key.");
             }
             return m_.at(key);
 
         default:;
     }
-    throw json_exception("非 Vector 或 Map 状态无法使用 at().");
+    throw json_exception("非 Array 或 Object 状态无法使用 at().");
 }
 const json &json::at(const json_key &key) const {
     switch (t_) {
-        case VECTOR:
+        case ARRAY:
             if (key.t_ != key.INTEGRAL) {
-                throw json_exception("Vector 状态下只能使用整数型 json_key.");
+                throw json_exception("Array 状态下只能使用整数型 json_key.");
             }
             return m_.at(key);
-        case MAP:
+        case OBJECT:
             if (key.t_ != key.STRING) {
-                throw json_exception("Map 状态下只能使用字符串型 json_key.");
+                throw json_exception("Object 状态下只能使用字符串型 json_key.");
             }
             return m_.at(key);
 
         default:;
     }
-    throw json_exception("非 Vector 或 Map 状态无法使用 at().");
+    throw json_exception("非 Array 或 Object 状态无法使用 at().");
 }
 
 json::operator std::string() const {
@@ -268,7 +269,7 @@ json::operator std::string() const {
             s += "\"";
             break;
 
-        case VECTOR:
+        case ARRAY:
             s = "[";
             for (auto iter = m_.begin(); iter != m_.end(); ++iter) {
                 if (iter != m_.begin()) {
@@ -279,7 +280,7 @@ json::operator std::string() const {
             s += "]";
             break;
 
-        case MAP:
+        case OBJECT:
             s = "{";
             for (auto iter = m_.begin(); iter != m_.end(); ++iter) {
                 if (iter != m_.begin()) {
@@ -295,41 +296,75 @@ json::operator std::string() const {
     return s;
 }
 
+template <class T>
+T json::cast() {
+    return cast_int<T>();
+}
+template <>
+bool json::cast<bool>() {
+    if (t_ == BOOL) {
+        return i_;
+    }
+    throw json_exception("非 Bool 状态无法转换为 bool.");
+}
+template <>
+float json::cast<float>() {
+    if (t_ == DOUBLE) {
+        return d_;
+    }
+    throw json_exception("非 Double 状态无法转换为 float.");
+}
+template <>
+double json::cast<double>() {
+    if (t_ == DOUBLE) {
+        return d_;
+    }
+    throw json_exception("非 Double 状态无法转换为 double.");
+}
+template <>
+std::string json::cast<std::string>() {
+    if (t_ == STRING) {
+        return s_;
+    } else {
+        return *this;
+    }
+}
+
 void json::push_back(const json &value) {
     if (t_ == NONE) {
-        t_ = VECTOR;
+        t_ = ARRAY;
         constructor();
     }
-    if (t_ != VECTOR) {
-        throw json_exception("非 Vector 状态无法使用 push_back.");
+    if (t_ != ARRAY) {
+        throw json_exception("非 Array 状态无法使用 push_back.");
     }
     m_[json_key(m_.size())] = value;
 }
 void json::push_back(json &&value) {
     if (t_ == NONE) {
-        t_ = VECTOR;
+        t_ = ARRAY;
         constructor();
     }
-    if (t_ != VECTOR) {
-        throw json_exception("非 Vector 状态无法使用 push_back.");
+    if (t_ != ARRAY) {
+        throw json_exception("非 Array 状态无法使用 push_back.");
     }
     m_[json_key(m_.size())] = std::move(value);
 }
 
 void json::erase(const json_key &key) {
     switch (t_) {
-        case VECTOR:
+        case ARRAY:
             if (key.t_ != key.INTEGRAL) {
                 throw json_exception(
-                    "Vector 状态下只能使用整数型 json_key.");
+                    "Array 状态下只能使用整数型 json_key.");
             }
-        case MAP:
+        case OBJECT:
             m_.erase(key);
             return;
 
         default:;
     }
-    throw json_exception("非 Vector 或 Map 状态无法使用 erase().");
+    throw json_exception("非 Array 或 Object 状态无法使用 erase().");
 }
 
 void json::clear() { change_type(NONE); }
@@ -352,8 +387,8 @@ void json::constructor() {
             new (&s_) std::string();
             return;
 
-        case VECTOR:
-        case MAP:
+        case ARRAY:
+        case OBJECT:
             new (&m_) std::map<json_key, json>();
             return;
 
@@ -367,8 +402,8 @@ void json::destructor() {
             s_.~basic_string();
             return;
 
-        case VECTOR:
-        case MAP:
+        case ARRAY:
+        case OBJECT:
             m_.~map();
             return;
 
@@ -383,6 +418,11 @@ void json::change_type(decltype(t_) t) {
     destructor();
     t_ = t;
     constructor();
+}
+
+template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
+Int json::cast_int() {
+    return i_;
 }
 
 json json::parse_array(const std::string &s, size_t begin, size_t end) {

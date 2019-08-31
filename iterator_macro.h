@@ -9,10 +9,10 @@
     ITERATOR_GROUP(act, type##iterator, name##begin) \
     ITERATOR_GROUP(act, type##iterator, name##end)
 
-#define ITERATOR_GROUP(act, type, name)             \
-    act##_ITERATOR_ITEM(type, name, );              \
-    act##_ITERATOR_ITEM(const_##type, name, const); \
-    act##_ITERATOR_ITEM(const_##type, c##name, const)
+#define ITERATOR_GROUP(act, type, name)                \
+    act##_ITERATOR_ITEM(type, name, )                  \
+        act##_ITERATOR_ITEM(const_##type, name, const) \
+            act##_ITERATOR_ITEM(const_##type, c##name, const)
 
 #define DECLARE_ITERATOR_ITEM(type, name, limit) \
     type name() limit;
