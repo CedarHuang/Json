@@ -351,6 +351,19 @@ void json::push_back(json &&value) {
     m_[json_key(m_.size())] = std::move(value);
 }
 
+json &json::back() {
+    if (t_ != ARRAY) {
+        throw json_exception("非 Array 状态无法使用 push_back.");
+    }
+    return (*--m_.end()).second;
+}
+const json &json::back() const {
+    if (t_ != ARRAY) {
+        throw json_exception("非 Array 状态无法使用 push_back.");
+    }
+    return (*--m_.cend()).second;
+}
+
 void json::erase(const json_key &key) {
     switch (t_) {
         case ARRAY:

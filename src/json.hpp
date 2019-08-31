@@ -108,6 +108,9 @@ struct json final {
     void push_back(const json &value);
     void push_back(json &&value);
 
+    json &back();
+    const json &back() const;
+
     void erase(const json_key &key);
 
     void clear();
