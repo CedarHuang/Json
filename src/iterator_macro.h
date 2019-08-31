@@ -17,12 +17,12 @@
 #define DECLARE_ITERATOR_ITEM(type, name, limit) \
     type name() limit;
 
-#define DEFINE_ITERATOR_ITEM(type, name, limit)                                 \
-    json::type json::name() limit {                                             \
-        if (t_ != VECTOR && t_ != MAP) {                                        \
-            throw json_exception("非 VECTOR 或 MAP 状态无法调用 " #name "()."); \
-        }                                                                       \
-        return m_.name();                                                       \
+#define DEFINE_ITERATOR_ITEM(type, name, limit)                                   \
+    json::type json::name() limit {                                               \
+        if (t_ != ARRAY && t_ != OBJECT) {                                        \
+            throw json_exception("非 Array 或 Object 状态无法调用 " #name "()."); \
+        }                                                                         \
+        return m_.name();                                                         \
     }
 
 #endif
