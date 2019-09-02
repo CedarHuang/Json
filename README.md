@@ -79,7 +79,7 @@ std::cout << j["floating_point"].cast<double>() << std::endl;
 ```
 当然也可以获取值的字符串:
 ```
-cout << j["integer"].cast() << std::endl;
+std::cout << j["integer"].cast() << std::endl;
 ```
 不填写模板参数即可.
 
