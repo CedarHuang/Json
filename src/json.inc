@@ -435,7 +435,10 @@ void json::change_type(decltype(t_) t) {
 
 template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
 Int json::cast_int() {
-    return i_;
+    if (t_ == INTEGRAL) {
+        return i_;
+    }
+    throw json_exception("非 Integral 状态无法转换.");
 }
 
 json json::parse_array(const std::string &s, size_t begin, size_t end) {
