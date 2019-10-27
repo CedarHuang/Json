@@ -120,7 +120,7 @@ struct json final {
     using reverse_iterator = std::map<json_key, json>::reverse_iterator;
     using const_reverse_iterator = std::map<json_key, json>::const_reverse_iterator;
 
-    ITERATOR(DECLARE)
+    _ITERATOR(DECLARE)
 
     static json parse(const std::string &json_str);
 

@@ -382,7 +382,7 @@ inline void json::erase(const json_key &key) {
 
 inline void json::clear() { change_type(NONE); }
 
-ITERATOR(DEFINE);
+_ITERATOR(DEFINE);
 
 inline json json::parse(const std::string &json_str) {
     std::stringstream ss(json_str);
