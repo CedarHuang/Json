@@ -158,6 +158,8 @@ struct json final {
 
     static size_t find_first_punctuation(char punctuation, const std::string s, size_t begin, size_t end);
 
+    static bool is_escape_double_quotes(const std::string &s, size_t index);
+
     friend std::ostream &operator<<(std::ostream &out, const json &j);
 };
 

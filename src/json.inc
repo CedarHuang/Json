@@ -353,13 +353,13 @@ inline void json::push_back(json &&value) {
 
 inline json &json::back() {
     if (t_ != ARRAY) {
-        throw json_exception("非 Array 状态无法使用 push_back.");
+        throw json_exception("非 Array 状态无法使用 back.");
     }
     return (*--m_.end()).second;
 }
 inline const json &json::back() const {
     if (t_ != ARRAY) {
-        throw json_exception("非 Array 状态无法使用 push_back.");
+        throw json_exception("非 Array 状态无法使用 back.");
     }
     return (*--m_.cend()).second;
 }
@@ -385,13 +385,21 @@ inline void json::clear() { change_type(NONE); }
 _ITERATOR(DEFINE);
 
 inline json json::parse(const std::string &json_str) {
-    std::stringstream ss(json_str);
     std::string s;
-    char c;
-    while (ss >> c) {
-        s += c;
+    bool in_double_quotes = false;
+    for (size_t i = 0; i < json_str.size(); ++i) {
+        if (json_str[i] == '"' && !is_escape_double_quotes(json_str, i)) {
+            in_double_quotes = !in_double_quotes;
+        }
+        if (!in_double_quotes && std::isspace(json_str[i])) {
+            continue;
+        }
+        s += json_str[i];
     }
-    return parse_object(s, 0, s.size());
+    if (s.empty()) {
+        return null;
+    }
+    return s.front() == '{' ? parse_object(s, 0, s.size()) : parse_array(s, 0, s.size());
 }
 
 inline void json::constructor() {
@@ -563,6 +571,17 @@ inline size_t json::find_first_punctuation(char punctuation, const std::string s
         }
     }
     return npos;
+}
+
+inline bool json::is_escape_double_quotes(const std::string &s, size_t index) {
+    size_t backslash_count = 0;
+    for (--index; index >= 0; --index) {
+        if (s[index] != '\\') {
+            break;
+        }
+        ++backslash_count;
+    }
+    return backslash_count & 1;
 }
 
 inline std::ostream &operator<<(std::ostream &out, const json &j) {
