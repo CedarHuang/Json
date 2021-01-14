@@ -265,7 +265,21 @@ inline json::operator std::string() const {
 
         case STRING:
             s = "\"";
-            s += s_;
+            for (auto i : s_) {
+                switch (i) {
+                    case '\"':
+                        s += "\\\"";
+                        break;
+                    case '\r':
+                        s += "\\r";
+                        break;
+                    case '\n':
+                        s += "\\n";
+                        break;
+                    default:
+                        s += i;
+                }
+            }
             s += "\"";
             break;
 
