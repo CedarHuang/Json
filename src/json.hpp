@@ -7,6 +7,8 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
+
 #include "iterator_macro.h"
 
 namespace cedar {
@@ -152,11 +154,11 @@ struct json final {
     template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type * = nullptr>
     Int cast_int();
 
-    static json parse_array(const std::string &s, size_t begin, size_t end);
+    static json parse_array(const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end);
 
-    static json parse_object(const std::string &s, size_t begin, size_t end);
+    static json parse_object(const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end);
 
-    static size_t find_first_punctuation(char punctuation, const std::string s, size_t begin, size_t end);
+    static size_t find_first_punctuation(char punctuation, const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end);
 
     static bool is_escape_double_quotes(const std::string &s, size_t index);
 

@@ -265,10 +265,13 @@ inline json::operator std::string() const {
 
         case STRING:
             s = "\"";
-            for (auto i : s_) {
-                switch (i) {
+            for (size_t i = 0; i < s_.size(); ++i) {
+                switch (s_[i]) {
                     case '\"':
-                        s += "\\\"";
+                        if (!is_escape_double_quotes(s_, i)) {
+                            s += '\\';
+                        }
+                        s += '\"';
                         break;
                     case '\r':
                         s += "\\r";
@@ -277,7 +280,7 @@ inline json::operator std::string() const {
                         s += "\\n";
                         break;
                     default:
-                        s += i;
+                        s += s_[i];
                 }
             }
             s += "\"";
@@ -399,21 +402,23 @@ inline void json::clear() { change_type(NONE); }
 _ITERATOR(DEFINE);
 
 inline json json::parse(const std::string &json_str) {
-    std::string s;
+    std::pair<std::string, std::vector<bool>> s;
     bool in_double_quotes = false;
     for (size_t i = 0; i < json_str.size(); ++i) {
+        bool pre_in = in_double_quotes;
         if (json_str[i] == '"' && !is_escape_double_quotes(json_str, i)) {
             in_double_quotes = !in_double_quotes;
         }
         if (!in_double_quotes && std::isspace(json_str[i])) {
             continue;
         }
-        s += json_str[i];
+        s.first += json_str[i];
+        s.second.push_back(in_double_quotes && pre_in);
     }
-    if (s.empty()) {
+    if (s.first.empty()) {
         return null;
     }
-    return s.front() == '{' ? parse_object(s, 0, s.size()) : parse_array(s, 0, s.size());
+    return s.first.front() == '{' ? parse_object(s, 0, s.first.size()) : parse_array(s, 0, s.first.size());
 }
 
 inline void json::constructor() {
@@ -463,7 +468,8 @@ inline Int json::cast_int() {
     throw json_exception("非 Integral 状态无法转换.");
 }
 
-inline json json::parse_array(const std::string &s, size_t begin, size_t end) {
+inline json json::parse_array(const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end) {
+    auto &s = pr.first;
     json j(json::array);
     if (begin == end) {
         return j;
@@ -472,14 +478,14 @@ inline json json::parse_array(const std::string &s, size_t begin, size_t end) {
 
     size_t len = end - 1;
     for (size_t i = begin + 1; i < len && legal;) {
-        auto comma_idx = find_first_punctuation(',', s, i, len);
+        auto comma_idx = find_first_punctuation(',', pr, i, len);
         if (comma_idx == npos) {
             comma_idx = len;
         }
 
         auto left = i;
         auto right = s[left] == '[' || s[left] == '{' || s[left] == '\"'
-                         ? find_first_punctuation(s[left] + (s[left] == '\"' ? 0 : 2), s, left + 1, comma_idx)
+                         ? find_first_punctuation(s[left] + (s[left] == '\"' ? 0 : 2), pr, left + 1, comma_idx)
                          : comma_idx;
         if (right == npos) {
             legal = false;
@@ -487,9 +493,9 @@ inline json json::parse_array(const std::string &s, size_t begin, size_t end) {
         }
 
         if (s[left] == '[') {
-            j.push_back(parse_array(s, left, right + 1));
+            j.push_back(parse_array(pr, left, right + 1));
         } else if (s[left] == '{') {
-            j.push_back(parse_object(s, left, right + 1));
+            j.push_back(parse_object(pr, left, right + 1));
         } else if (s[left] == '\"') {
             j.push_back(s.substr(left + 1, right - left - 1));
         } else if (s[left] == 'n') {
@@ -498,7 +504,7 @@ inline json json::parse_array(const std::string &s, size_t begin, size_t end) {
             j.push_back(s[left] == 't');
         } else {
             bool has_dot =
-                find_first_punctuation('.', s, left, right) != npos;
+                find_first_punctuation('.', pr, left, right) != npos;
             if (has_dot) {
                 j.push_back(std::stod(s.substr(left)));
             } else {
@@ -513,7 +519,8 @@ inline json json::parse_array(const std::string &s, size_t begin, size_t end) {
     throw json_exception("不是合法的 Json.");
 }
 
-inline json json::parse_object(const std::string &s, size_t begin, size_t end) {
+inline json json::parse_object(const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end) {
+    auto &s = pr.first;
     json j(json::object);
     if (begin == end) {
         return j;
@@ -522,17 +529,17 @@ inline json json::parse_object(const std::string &s, size_t begin, size_t end) {
 
     size_t len = end - 1;
     for (size_t i = begin + 1; i < len && legal;) {
-        auto comma_idx = find_first_punctuation(',', s, i, len);
+        auto comma_idx = find_first_punctuation(',', pr, i, len);
         if (comma_idx == npos) {
             comma_idx = len;
         }
-        auto colon_idx = find_first_punctuation(':', s, i, comma_idx);
+        auto colon_idx = find_first_punctuation(':', pr, i, comma_idx);
 
         std::string key = s.substr(i + 1, colon_idx - i - 2);
 
         auto left = colon_idx + 1;
         auto right = s[left] == '[' || s[left] == '{' || s[left] == '\"'
-                         ? find_first_punctuation(s[left] + (s[left] == '\"' ? 0 : 2), s, left + 1, comma_idx)
+                         ? find_first_punctuation(s[left] + (s[left] == '\"' ? 0 : 2), pr, left + 1, comma_idx)
                          : comma_idx;
         if (right == npos) {
             legal = false;
@@ -540,9 +547,9 @@ inline json json::parse_object(const std::string &s, size_t begin, size_t end) {
         }
 
         if (s[left] == '[') {
-            j[std::move(key)] = parse_array(s, left, right + 1);
+            j[std::move(key)] = parse_array(pr, left, right + 1);
         } else if (s[left] == '{') {
-            j[std::move(key)] = parse_object(s, left, right + 1);
+            j[std::move(key)] = parse_object(pr, left, right + 1);
         } else if (s[left] == '\"') {
             j[std::move(key)] = s.substr(left + 1, right - left - 1);
         } else if (s[left] == 'n') {
@@ -551,7 +558,7 @@ inline json json::parse_object(const std::string &s, size_t begin, size_t end) {
             j[std::move(key)] = s[left] == 't';
         } else {
             bool has_dot =
-                find_first_punctuation('.', s, left, right) != npos;
+                find_first_punctuation('.', pr, left, right) != npos;
             if (has_dot) {
                 j[std::move(key)] = std::stod(s.substr(left));
             } else {
@@ -566,10 +573,14 @@ inline json json::parse_object(const std::string &s, size_t begin, size_t end) {
     throw json_exception("不是合法的 Json.");
 }
 
-inline size_t json::find_first_punctuation(char punctuation, const std::string s, size_t begin, size_t end) {
+inline size_t json::find_first_punctuation(char punctuation, const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end) {
+    auto &s = pr.first;
     bool left_qm = false;
     int count = 0;
     for (size_t i = begin; i < end; ++i) {
+        if (pr.second[i]) {
+            continue;
+        }
         if (s[i] == punctuation && count == 0) {
             return i;
         } else if (s[i] == '{' || s[i] == '[' || (s[i] == '\"' && !left_qm)) {
