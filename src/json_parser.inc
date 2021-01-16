@@ -17,13 +17,13 @@ inline json_parser::json_parser(const std::string &s) {
 
 inline json json_parser::do_it() {
     if (s_.empty()) {
-        return json::null;
+        return json::null();
     }
     return s_.front() == '{' ? parse_object(0, s_.size()) : parse_array(0, s_.size());
 }
 
 inline json json_parser::parse_array(size_t begin, size_t end) {
-    json j(json::array);
+    json j((json::array()));
     if (begin == end) {
         return j;
     }
@@ -73,7 +73,7 @@ inline json json_parser::parse_array(size_t begin, size_t end) {
 }
 
 inline json json_parser::parse_object(size_t begin, size_t end) {
-    json j(json::object);
+    json j((json::object()));
     if (begin == end) {
         return j;
     }

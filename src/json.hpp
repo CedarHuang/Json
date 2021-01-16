@@ -66,13 +66,17 @@ struct json_key final {
     friend std::ostream &operator<<(std::ostream &out, const json_key &j);
 };
 
+struct json_null {
+};
+struct json_array {
+};
+struct json_object {
+};
+
 struct json final {
-    static constexpr struct json_null {
-    } *null = nullptr;
-    static constexpr struct json_array {
-    } *array = nullptr;
-    static constexpr struct json_object {
-    } *object = nullptr;
+    using null = json_null;
+    using array = json_array;
+    using object = json_object;
 
     json();
 
@@ -88,9 +92,9 @@ struct json final {
     json(const std::string &s);
     json(std::string &&s);
 
-    json(const json_null *);
-    json(const json_array *);
-    json(const json_object *);
+    json(const json_null &);
+    json(const json_array &);
+    json(const json_object &);
 
     json(const json &other);
     json(json &&other);
@@ -178,6 +182,7 @@ struct json_parser final {
   private:
     std::string s_;
     std::vector<bool> in_double_quotes_;
+    std::map<size_t, size_t> pair_index_;
 
     static constexpr size_t npos = -1;
 

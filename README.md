@@ -15,9 +15,9 @@ j["integer"] = 2;
 j["floating_point"] = 123.456;
 j["bool"] = true;
 j["string"] = "hello world";
-j["null"] = cedar::json::null;
-j["array"] = cedar::json::array;
-j["object"] = cedar::json::object;
+j["null"] = cedar::json::null();
+j["array"] = cedar::json::array();
+j["object"] = cedar::json::object();
 for (uint32_t i = 0; i < 5; ++i) {
     j["sequence"].push_back(i);
 }
