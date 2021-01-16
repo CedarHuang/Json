@@ -259,7 +259,7 @@ inline json::operator std::string() const {
 
         case DOUBLE: {
             std::stringstream ss;
-            ss << d_;
+            ss << std::setprecision(std::numeric_limits<double>::digits10 + 1) << d_;
             ss >> s;
         } break;
 

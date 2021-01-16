@@ -1,7 +1,10 @@
 #ifndef __CEDAR_JSON_HPP__
 #define __CEDAR_JSON_HPP__
 
+#include <cmath>
 #include <exception>
+#include <iomanip>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
