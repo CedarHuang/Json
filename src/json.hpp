@@ -66,11 +66,33 @@ struct json_key final {
     friend std::ostream &operator<<(std::ostream &out, const json_key &j);
 };
 
+struct json;
+
 struct json_null {
 };
 struct json_array {
+  public:
+    using data_type = std::vector<json>;
+
+    json_array() = default;
+    json_array(std::initializer_list<data_type::value_type> init);
+
+    const data_type &data() const;
+
+  private:
+    data_type data_;
 };
 struct json_object {
+  public:
+    using data_type = std::map<json_key, json>;
+
+    json_object() = default;
+    json_object(std::initializer_list<data_type::value_type> init);
+
+    const data_type &data() const;
+
+  private:
+    data_type data_;
 };
 
 struct json final {
@@ -195,5 +217,6 @@ struct json_parser final {
 #include "json_exception.inc"
 #include "json_key.inc"
 #include "json_parser.inc"
+#include "json_utils.inc"
 
 #endif

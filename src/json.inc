@@ -15,8 +15,18 @@ inline json::json(const std::string &s) : t_(STRING) { new (&s_) std::string(s);
 inline json::json(std::string &&s) : t_(STRING) { new (&s_) std::string(std::move(s)); }
 
 inline json::json(const json_null &) : t_(NONE) {}
-inline json::json(const json_array &) : t_(ARRAY) { constructor(); }
-inline json::json(const json_object &) : t_(OBJECT) { constructor(); }
+inline json::json(const json_array &a) : t_(ARRAY) {
+    constructor();
+    for (auto &i : a.data()) {
+        push_back(i);
+    }
+}
+inline json::json(const json_object &o) : t_(OBJECT) {
+    constructor();
+    for (auto &i : o.data()) {
+        operator[](i.first) = i.second;
+    }
+}
 
 inline json::json(const json &other) : t_(NONE) { *this = other; }
 inline json::json(json &&other) : t_(NONE) { *this = std::move(other); }

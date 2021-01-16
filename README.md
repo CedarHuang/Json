@@ -23,6 +23,23 @@ for (uint32_t i = 0; i < 5; ++i) {
 }
 j["object2"]["key"] = "value";
 ```
+2021.01.17 增加实验性生成方式:
+```cpp
+cedar::json j = cedar::json::object{
+    {"integer", 2},
+    {"floating_point", 123.456},
+    {"bool", true},
+    {"string", "hello world"},
+    {"null", cedar::json::null()},
+    {"array", cedar::json::array()},
+    {"object", cedar::json::object()},
+    {"sequence", cedar::json::array{
+            0, 1, 2, 3, 4}},
+    {"object2", cedar::json::object{
+            {"key", "value"}}},
+};
+```
+这两种形式完全等价.
 
 ### 输出
 ```cpp
