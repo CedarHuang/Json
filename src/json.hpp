@@ -146,8 +146,6 @@ struct json final {
         std::map<json_key, json> m_;
     };
 
-    static constexpr size_t npos = -1;
-
     void constructor();
 
     void destructor();
@@ -157,19 +155,40 @@ struct json final {
     template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type * = nullptr>
     Int cast_int();
 
-    static json parse_array(const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end);
+    friend std::ostream &operator<<(std::ostream &out, const json &j);
+};
 
-    static json parse_object(const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end);
+struct json_parser final {
+  public:
+    json_parser(const std::string &s);
 
-    static size_t find_first_punctuation(char punctuation, const std::pair<std::string, std::vector<bool>> &pr, size_t begin, size_t end);
+    ~json_parser() = default;
+
+    json do_it();
+
+  private:
+    json parse_array(size_t begin, size_t end);
+
+    json parse_object(size_t begin, size_t end);
+
+    size_t find_first_punctuation(char punctuation, size_t begin, size_t end);
 
     static bool is_escape_double_quotes(const std::string &s, size_t index);
 
-    friend std::ostream &operator<<(std::ostream &out, const json &j);
+  private:
+    std::string s_;
+    std::vector<bool> in_double_quotes_;
+
+    static constexpr size_t npos = -1;
+
+    friend json;
 };
 
 }  // namespace cedar
 
 #include "json.inc"
+#include "json_exception.inc"
+#include "json_key.inc"
+#include "json_parser.inc"
 
 #endif
