@@ -95,9 +95,6 @@ inline json &json::operator[](const json_key &key) {
             if (key.t_ != key.INTEGRAL) {
                 throw json_exception("Array 状态下只能使用整数型 json_key.");
             }
-            if (static_cast<size_t>(key.i_) > m_.size()) {
-                throw json_exception("只能按序创造元素.");
-            }
             return m_[key];
         case OBJECT:
             if (key.t_ != key.STRING) {
@@ -189,16 +186,23 @@ inline json::operator std::string() const {
             s += "\"";
             break;
 
-        case ARRAY:
+        case ARRAY: {
             s = "[";
-            for (auto iter = m_.begin(); iter != m_.end(); ++iter) {
-                if (iter != m_.begin()) {
+            long long index = 0;
+            for (auto iter = m_.begin(); iter != m_.end(); ++iter, ++index) {
+                for (; index < iter->first.i_; ++index) {
+                    if (index != 0) {
+                        s += ",";
+                    }
+                    s += "null";
+                }
+                if (index != 0) {
                     s += ",";
                 }
                 s += iter->second;
             }
             s += "]";
-            break;
+        } break;
 
         case OBJECT:
             s = "{";
