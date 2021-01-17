@@ -14,14 +14,14 @@ inline json::json(const char *s) : t_(STRING) { new (&s_) std::string(s); }
 inline json::json(const std::string &s) : t_(STRING) { new (&s_) std::string(s); }
 inline json::json(std::string &&s) : t_(STRING) { new (&s_) std::string(std::move(s)); }
 
-inline json::json(const json_null &) : t_(NONE) {}
-inline json::json(const json_array &a) : t_(ARRAY) {
+inline json::json(const null &) : t_(NONE) {}
+inline json::json(const array &a) : t_(ARRAY) {
     constructor();
     for (auto &i : a.data()) {
         push_back(i);
     }
 }
-inline json::json(const json_object &o) : t_(OBJECT) {
+inline json::json(const object &o) : t_(OBJECT) {
     constructor();
     for (auto &i : o.data()) {
         operator[](i.first) = i.second;

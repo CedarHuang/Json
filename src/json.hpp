@@ -114,9 +114,9 @@ struct json final {
     json(const std::string &s);
     json(std::string &&s);
 
-    json(const json_null &);
-    json(const json_array &);
-    json(const json_object &);
+    json(const null &);
+    json(const array &a);
+    json(const object &o);
 
     json(const json &other);
     json(json &&other);
