@@ -262,7 +262,7 @@ inline void json::push_back(const json &value) {
     if (t_ != ARRAY) {
         throw json_exception("非 Array 状态无法使用 push_back.");
     }
-    m_[json_key(m_.size())] = value;
+    m_[len()] = value;
 }
 inline void json::push_back(json &&value) {
     if (t_ == NONE) {
@@ -272,7 +272,7 @@ inline void json::push_back(json &&value) {
     if (t_ != ARRAY) {
         throw json_exception("非 Array 状态无法使用 push_back.");
     }
-    m_[json_key(m_.size())] = std::move(value);
+    m_[len()] = std::move(value);
 }
 
 inline json &json::back() {
@@ -302,6 +302,41 @@ inline void json::erase(const json_key &key) {
         default:;
     }
     throw json_exception("非 Array 或 Object 状态无法使用 erase().");
+}
+
+inline size_t json::size() const {
+    switch (t_) {
+        case ARRAY:
+        case OBJECT:
+            return m_.size();
+
+        default:;
+    }
+    throw json_exception("非 Array 或 Object 状态无法使用 size().");
+}
+inline size_t json::len() const {
+    switch (t_) {
+        case ARRAY:
+            return m_.size() ? (*--m_.cend()).first.i_ + 1 : 0;
+
+        case OBJECT:
+            return m_.size();
+
+        default:;
+    }
+    throw json_exception("非 Array 或 Object 状态无法使用 len().");
+}
+
+inline void json::fill_array(const json &sam) {
+    if (t_ != ARRAY) {
+        throw json_exception("非 Array 状态无法使用 fill_array.");
+    }
+    long long index = 0;
+    for (auto iter = m_.begin(); iter != m_.end(); ++iter, ++index) {
+        for (; index < iter->first.i_; ++index) {
+            operator[](index) = sam;
+        }
+    }
 }
 
 inline void json::clear() { change_type(NONE); }

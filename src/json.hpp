@@ -144,6 +144,11 @@ struct json final {
 
     void erase(const json_key &key);
 
+    size_t size() const;
+    size_t len() const;
+
+    void fill_array(const json &sam = null());
+
     void clear();
 
     using iterator = std::map<json_key, json>::iterator;
