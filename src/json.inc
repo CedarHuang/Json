@@ -335,16 +335,22 @@ inline void json::erase(const json_key &key) {
 
 inline size_t json::size() const {
     switch (t_) {
+        case STRING:
+            return s_.size();
+
         case ARRAY:
         case OBJECT:
             return m_.size();
 
         default:;
     }
-    throw json_exception("非 Array 或 Object 状态无法使用 size().");
+    throw json_exception("非 String 或 Array 或 Object 状态无法使用 size().");
 }
 inline size_t json::len() const {
     switch (t_) {
+        case STRING:
+            return s_.size();
+
         case ARRAY:
             return m_.size() ? (*--m_.cend()).first.i_ + 1 : 0;
 
@@ -353,7 +359,7 @@ inline size_t json::len() const {
 
         default:;
     }
-    throw json_exception("非 Array 或 Object 状态无法使用 len().");
+    throw json_exception("非 String 或 Array 或 Object 状态无法使用 len().");
 }
 
 inline void json::fill_array(const json &sam) {

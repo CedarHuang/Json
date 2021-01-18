@@ -8,6 +8,7 @@
 | `const json &at(const json_key &key) const;` | (2) |
 
 取 `json_key` 对应 `json`, 若无对应 `json`, 则抛出 `std::out_of_range` 类型异常。  
+若 `json_key` 为空洞部分, 亦抛出 `std::out_of_range` 类型异常。  
 若 `this` 为 `Array` 状态, 则 `json_key` 必须为 `Integer` 状态.  
 若 `this` 为 `Object` 状态, 则 `json_key` 必须为 `String` 状态.  
 
