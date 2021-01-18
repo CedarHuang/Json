@@ -165,7 +165,7 @@ struct json final {
         NONE = 1,
         BOOL = 2,
         INTEGRAL = 4,
-        DOUBLE = 8,
+        DECIMAL = 8,
         STRING = 16,
         ARRAY = 32,
         OBJECT = 64

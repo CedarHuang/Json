@@ -7,8 +7,8 @@ inline json::json(Int i) : t_(INTEGRAL), i_(i) {}
 
 inline json::json(bool i) : t_(BOOL), i_(i) {}
 
-inline json::json(float d) : t_(DOUBLE), d_(d) {}
-inline json::json(double d) : t_(DOUBLE), d_(d) {}
+inline json::json(float d) : t_(DECIMAL), d_(d) {}
+inline json::json(double d) : t_(DECIMAL), d_(d) {}
 
 inline json::json(const char *s) : t_(STRING) { new (&s_) std::string(s); }
 inline json::json(const std::string &s) : t_(STRING) { new (&s_) std::string(s); }
@@ -41,7 +41,7 @@ inline json &json::operator=(const json &other) {
             i_ = other.i_;
             break;
 
-        case DOUBLE:
+        case DECIMAL:
             d_ = other.d_;
             break;
 
@@ -66,7 +66,7 @@ inline json &json::operator=(json &&other) {
             i_ = other.i_;
             break;
 
-        case DOUBLE:
+        case DECIMAL:
             d_ = other.d_;
             break;
 
@@ -157,7 +157,7 @@ inline json::operator std::string() const {
             s = std::to_string(i_);
             break;
 
-        case DOUBLE: {
+        case DECIMAL: {
             std::stringstream ss;
             ss << std::setprecision(std::numeric_limits<double>::digits10 + 1) << d_;
             ss >> s;
@@ -233,17 +233,17 @@ inline bool json::cast<bool>() {
 }
 template <>
 inline float json::cast<float>() {
-    if (t_ == DOUBLE) {
+    if (t_ == DECIMAL) {
         return d_;
     }
-    throw json_exception("非 Double 状态无法转换为 float.");
+    throw json_exception("非 Decimal 状态无法转换为 float.");
 }
 template <>
 inline double json::cast<double>() {
-    if (t_ == DOUBLE) {
+    if (t_ == DECIMAL) {
         return d_;
     }
-    throw json_exception("非 Double 状态无法转换为 double.");
+    throw json_exception("非 Decimal 状态无法转换为 double.");
 }
 template <>
 inline std::string json::cast<std::string>() {

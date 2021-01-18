@@ -2,11 +2,11 @@
 
 [`cedar::json`](./cedar::json.md) 成员函数
 
-| 函数原型                                |      |
-| --------------------------------------- | ---- |
-| `json &operator[](const json_key &key)` |      |
+| 函数原型                                |     |
+| --------------------------------------- | --- |
+| `json &operator[](const json_key &key)` |     |
 
-取 `json_key` 对应 `json`.  
+取 `json_key` 对应 `json`, 若无对应 `json`, 则默认构造.  
 若 `this` 为 `Array` 状态, 则 `json_key` 必须为 `Integral` 状态.  
 若 `this` 为 `Object` 状态, 则 `json_key` 必须为 `String` 状态.  
 若 `this` 为 `Null` 状态, 则若 `json_key` 为 `Integral` 状态, `this` 转变为 `Array` 状态, 若 `json_key` 为 `String` 状态, `this` 转变为 `Object` 状态.
