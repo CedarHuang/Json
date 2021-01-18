@@ -15,7 +15,7 @@
 
 1) 默认构造函数, 构造 `Null` 状态的 `cedar::json`.  
 2) 通过 `bool` 值构造一个 `Bool` 状态的 `cedar::json`.  
-3) 通过整数类型数值构造一个 `Integral` 状态的 `cedar::json`, 内部统一使用 `long long` 存储.  
+3) 通过整数类型数值构造一个 `Integer` 状态的 `cedar::json`, 内部统一使用 `long long` 存储.  
 4) 通过浮点数类型数值构造一个 `Decimal` 状态的 `cedar::json`, 内部统一使用 `double` 存储.  
 5) 通过字符串类型构造一个 `String` 状态的 `cedar::json`, 内部统一使用 `std::string` 存储.  
 6) 通过 `cedar::json::null` 构造 `Null` 状态的 `cedar::json`.  

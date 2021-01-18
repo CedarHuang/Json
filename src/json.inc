@@ -3,7 +3,7 @@ namespace cedar {
 inline json::json() : t_(NONE) {}
 
 template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
-inline json::json(Int i) : t_(INTEGRAL), i_(i) {}
+inline json::json(Int i) : t_(INTEGER), i_(i) {}
 
 inline json::json(bool i) : t_(BOOL), i_(i) {}
 
@@ -37,7 +37,7 @@ inline json &json::operator=(const json &other) {
     change_type(other.t_);
     switch (t_) {
         case BOOL:
-        case INTEGRAL:
+        case INTEGER:
             i_ = other.i_;
             break;
 
@@ -62,7 +62,7 @@ inline json &json::operator=(json &&other) {
     change_type(other.t_);
     switch (t_) {
         case BOOL:
-        case INTEGRAL:
+        case INTEGER:
             i_ = other.i_;
             break;
 
@@ -87,12 +87,12 @@ inline json &json::operator=(json &&other) {
 
 inline json &json::operator[](const json_key &key) {
     if (t_ == NONE) {
-        t_ = key.t_ == key.INTEGRAL ? ARRAY : OBJECT;
+        t_ = key.t_ == key.INTEGER ? ARRAY : OBJECT;
         constructor();
     }
     switch (t_) {
         case ARRAY:
-            if (key.t_ != key.INTEGRAL) {
+            if (key.t_ != key.INTEGER) {
                 throw json_exception("Array 状态下只能使用整数型 json_key.");
             }
             return m_[key];
@@ -110,7 +110,7 @@ inline json &json::operator[](const json_key &key) {
 inline json &json::at(const json_key &key) {
     switch (t_) {
         case ARRAY:
-            if (key.t_ != key.INTEGRAL) {
+            if (key.t_ != key.INTEGER) {
                 throw json_exception("Array 状态下只能使用整数型 json_key.");
             }
             return m_.at(key);
@@ -127,7 +127,7 @@ inline json &json::at(const json_key &key) {
 inline const json &json::at(const json_key &key) const {
     switch (t_) {
         case ARRAY:
-            if (key.t_ != key.INTEGRAL) {
+            if (key.t_ != key.INTEGER) {
                 throw json_exception("Array 状态下只能使用整数型 json_key.");
             }
             return m_.at(key);
@@ -153,7 +153,7 @@ inline json::operator std::string() const {
             s = i_ ? "true" : "false";
             break;
 
-        case INTEGRAL:
+        case INTEGER:
             s = std::to_string(i_);
             break;
 
@@ -221,11 +221,11 @@ inline json::operator std::string() const {
 }
 
 template <>
-inline json::integral &json::cast<json::integral &>() {
-    if (t_ == INTEGRAL) {
+inline json::integer &json::cast<json::integer &>() {
+    if (t_ == INTEGER) {
         return i_;
     }
-    throw json_exception("非 Integral 状态无法转换为 integral &.");
+    throw json_exception("非 Integer 状态无法转换为 integer &.");
 }
 template <>
 inline json::decimal &json::cast<json::decimal &>() {
@@ -320,7 +320,7 @@ inline const json &json::back() const {
 inline void json::erase(const json_key &key) {
     switch (t_) {
         case ARRAY:
-            if (key.t_ != key.INTEGRAL) {
+            if (key.t_ != key.INTEGER) {
                 throw json_exception(
                     "Array 状态下只能使用整数型 json_key.");
             }
@@ -417,10 +417,10 @@ inline void json::change_type(decltype(t_) t) {
 
 template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
 inline Int json::cast_int() const {
-    if (t_ == INTEGRAL) {
+    if (t_ == INTEGER) {
         return i_;
     }
-    throw json_exception("非 Integral 状态无法转换.");
+    throw json_exception("非 Integer 状态无法转换.");
 }
 
 inline std::ostream &operator<<(std::ostream &out, const json &j) {

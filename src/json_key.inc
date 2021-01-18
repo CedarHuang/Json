@@ -1,7 +1,7 @@
 namespace cedar {
 
 template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
-inline json_key::json_key(Int i) : t_(INTEGRAL), i_(i) {}
+inline json_key::json_key(Int i) : t_(INTEGER), i_(i) {}
 
 inline json_key::json_key(const char *s) : t_(STRING) { new (&s_) std::string(s); }
 inline json_key::json_key(const std::string &s) : t_(STRING) { new (&s_) std::string(s); }
@@ -15,7 +15,7 @@ inline json_key::~json_key() { destructor(); }
 inline json_key &json_key::operator=(const json_key &other) {
     change_type(other.t_);
     switch (t_) {
-        case INTEGRAL:
+        case INTEGER:
             i_ = other.i_;
             break;
 
@@ -30,7 +30,7 @@ inline json_key &json_key::operator=(const json_key &other) {
 inline json_key &json_key::operator=(json_key &&other) {
     change_type(other.t_);
     switch (t_) {
-        case INTEGRAL:
+        case INTEGER:
             i_ = other.i_;
             break;
 
@@ -49,7 +49,7 @@ inline bool json_key::operator<(const json_key &other) const {
         return t_ < other.t_;
     }
     switch (t_) {
-        case INTEGRAL:
+        case INTEGER:
             return i_ < other.i_;
 
         case STRING:

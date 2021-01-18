@@ -8,13 +8,13 @@
 | `const json &at(const json_key &key) const;` | (2) |
 
 取 `json_key` 对应 `json`, 若无对应 `json`, 则抛出 `std::out_of_range` 类型异常。
-若 `this` 为 `Array` 状态, 则 `json_key` 必须为 `Integral` 状态.  
+若 `this` 为 `Array` 状态, 则 `json_key` 必须为 `Integer` 状态.  
 若 `this` 为 `Object` 状态, 则 `json_key` 必须为 `String` 状态.  
 
 ## 异常
 
 当 `this` 不为 `Array` `Ojbect` 状态时,  
-当 `this` 为 `Array` 而 `json_key` 不为 `Integral` 时,  
+当 `this` 为 `Array` 而 `json_key` 不为 `Integer` 时,  
 当 `this` 为 `Object` 而 `json_key` 不为 `String` 时,  
 抛出异常.
 

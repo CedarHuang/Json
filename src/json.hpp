@@ -48,7 +48,7 @@ struct json_key final {
 
   private:
     enum { NONE = 1,
-           INTEGRAL = 4,
+           INTEGER = 4,
            STRING = 16
     } t_;
     union {
@@ -100,7 +100,7 @@ struct json final {
     using array = json_array;
     using object = json_object;
 
-    using integral = long long;
+    using integer = long long;
     using decimal = double;
     using string = std::string;
 
@@ -171,14 +171,14 @@ struct json final {
     enum {
         NONE = 1,
         BOOL = 2,
-        INTEGRAL = 4,
+        INTEGER = 4,
         DECIMAL = 8,
         STRING = 16,
         ARRAY = 32,
         OBJECT = 64
     } t_;
     union {
-        integral i_;
+        integer i_;
         decimal d_;
         string s_;
         std::map<json_key, json> m_;
