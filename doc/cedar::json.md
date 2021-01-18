@@ -4,18 +4,20 @@
 
 ## 成员类型
 
-| 成员类型                 | 定义                                                             |
-| ------------------------ | ---------------------------------------------------------------- |
-| `null`                   | `cedar::json_null`                                               |
-| `array`                  | `cedar::json_array`                                              |
-| `object`                 | `cedar::json_object`                                             |
-| `integer`                | `long long`                                                      |
-| `decimal`                | `double`                                                         |
-| `string`                 | `std::string`                                                    |
-| `iterator`               | `std::map<cedar::json_key, cedar::json>::iterator`               |
-| `const_iterator`         | `std::map<cedar::json_key, cedar::json>::const_iterator`         |
-| `reverse_iterator`       | `std::map<cedar::json_key, cedar::json>::reverse_iterator`       |
-| `const_reverse_iterator` | `std::map<cedar::json_key, cedar::json>::const_reverse_iterator` |
+| 成员类型                 | 简写 | 定义                                                             |
+| ------------------------ | ---- | ---------------------------------------------------------------- |
+| `null`                   | `N`  | `cedar::json_null`                                               |
+| `array`                  | `A`  | `cedar::json_array`                                              |
+| `object`                 | `O`  | `cedar::json_object`                                             |
+| `integer`                | `I`  | `long long`                                                      |
+| `decimal`                | `D`  | `double`                                                         |
+| `string`                 | `S`  | `std::string`                                                    |
+| `iterator`               |      | `std::map<cedar::json_key, cedar::json>::iterator`               |
+| `const_iterator`         |      | `std::map<cedar::json_key, cedar::json>::const_iterator`         |
+| `reverse_iterator`       |      | `std::map<cedar::json_key, cedar::json>::reverse_iterator`       |
+| `const_reverse_iterator` |      | `std::map<cedar::json_key, cedar::json>::const_reverse_iterator` |
+
+是否使用简写, 仅凭使用者主观意愿.
 
 | 成员函数                             |                                 |
 | ------------------------------------ | ------------------------------- |

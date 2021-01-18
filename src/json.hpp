@@ -95,14 +95,19 @@ struct json_object {
     data_type data_;
 };
 
-struct json final {
-    using null = json_null;
-    using array = json_array;
-    using object = json_object;
+using J = struct json final {
+#define USING_(long_, short_, target_) \
+    using long_ = target_;             \
+    using short_ = long_
 
-    using integer = long long;
-    using decimal = double;
-    using string = std::string;
+    USING_(null, N, json_null);
+    USING_(array, A, json_array);
+    USING_(object, O, json_object);
+
+    USING_(integer, I, long long);
+    USING_(decimal, D, double);
+    USING_(string, S, std::string);
+#undef USING_
 
     json();
 

@@ -29,11 +29,12 @@ using namespace std;
 using namespace cedar;
 
 int main() {
-    json j;
+    // json j;
+    J j;
     j["int"] = 1;
     cout << j.at("int") << endl;
 
-    json j2;
+    J j2;
     j2[3] = 3;
     cout << j2.at(3) << endl;
 
