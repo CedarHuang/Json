@@ -9,6 +9,9 @@
 | `null`                   | `cedar::json_null`                                               |
 | `array`                  | `cedar::json_array`                                              |
 | `object`                 | `cedar::json_object`                                             |
+| `integral`               | `long long`                                                      |
+| `decimal`                | `double`                                                         |
+| `string`                 | `std::string`                                                    |
 | `iterator`               | `std::map<cedar::json_key, cedar::json>::iterator`               |
 | `const_iterator`         | `std::map<cedar::json_key, cedar::json>::const_iterator`         |
 | `reverse_iterator`       | `std::map<cedar::json_key, cedar::json>::reverse_iterator`       |

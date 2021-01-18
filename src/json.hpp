@@ -100,6 +100,10 @@ struct json final {
     using array = json_array;
     using object = json_object;
 
+    using integral = long long;
+    using decimal = double;
+    using string = std::string;
+
     json();
 
     json(bool i);
@@ -133,8 +137,11 @@ struct json final {
 
     operator std::string() const;
 
+    template <class T, typename std::enable_if<std::is_lvalue_reference<T>::value && !std::is_const<typename std::remove_reference<T>::type>::value>::type * = nullptr>
+    T cast() = delete;
+
     template <class T = std::string>
-    T cast();
+    T cast() const;
 
     void push_back(const json &value);
     void push_back(json &&value);
@@ -171,9 +178,9 @@ struct json final {
         OBJECT = 64
     } t_;
     union {
-        long long i_;
-        double d_;
-        std::string s_;
+        integral i_;
+        decimal d_;
+        string s_;
         std::map<json_key, json> m_;
     };
 
@@ -184,7 +191,7 @@ struct json final {
     void change_type(decltype(t_) t);
 
     template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type * = nullptr>
-    Int cast_int();
+    Int cast_int() const;
 
     friend std::ostream &operator<<(std::ostream &out, const json &j);
 };

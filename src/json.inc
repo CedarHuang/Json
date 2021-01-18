@@ -10,9 +10,9 @@ inline json::json(bool i) : t_(BOOL), i_(i) {}
 inline json::json(float d) : t_(DECIMAL), d_(d) {}
 inline json::json(double d) : t_(DECIMAL), d_(d) {}
 
-inline json::json(const char *s) : t_(STRING) { new (&s_) std::string(s); }
-inline json::json(const std::string &s) : t_(STRING) { new (&s_) std::string(s); }
-inline json::json(std::string &&s) : t_(STRING) { new (&s_) std::string(std::move(s)); }
+inline json::json(const char *s) : t_(STRING) { new (&s_) string(s); }
+inline json::json(const std::string &s) : t_(STRING) { new (&s_) string(s); }
+inline json::json(std::string &&s) : t_(STRING) { new (&s_) string(std::move(s)); }
 
 inline json::json(const null &) : t_(NONE) {}
 inline json::json(const array &a) : t_(ARRAY) {
@@ -220,38 +220,67 @@ inline json::operator std::string() const {
     return s;
 }
 
+template <>
+inline json::integral &json::cast<json::integral &>() {
+    if (t_ == INTEGRAL) {
+        return i_;
+    }
+    throw json_exception("非 Integral 状态无法转换为 integral &.");
+}
+template <>
+inline json::decimal &json::cast<json::decimal &>() {
+    if (t_ == DECIMAL) {
+        return d_;
+    }
+    throw json_exception("非 Decimal 状态无法转换为 decimal &.");
+}
+template <>
+inline json::string &json::cast<json::string &>() {
+    if (t_ == STRING) {
+        return s_;
+    }
+    throw json_exception("非 String 状态无法转换为 string &.");
+}
+
 template <class T>
-inline T json::cast() {
+inline T json::cast() const {
     return cast_int<T>();
 }
 template <>
-inline bool json::cast<bool>() {
+inline bool json::cast<bool>() const {
     if (t_ == BOOL) {
         return i_;
     }
     throw json_exception("非 Bool 状态无法转换为 bool.");
 }
 template <>
-inline float json::cast<float>() {
+inline float json::cast<float>() const {
     if (t_ == DECIMAL) {
         return d_;
     }
     throw json_exception("非 Decimal 状态无法转换为 float.");
 }
 template <>
-inline double json::cast<double>() {
+inline double json::cast<double>() const {
     if (t_ == DECIMAL) {
         return d_;
     }
     throw json_exception("非 Decimal 状态无法转换为 double.");
 }
 template <>
-inline std::string json::cast<std::string>() {
+inline std::string json::cast<std::string>() const {
     if (t_ == STRING) {
         return s_;
     } else {
         return *this;
     }
+}
+template <>
+inline const std::string &json::cast<const std::string &>() const {
+    if (t_ == STRING) {
+        return s_;
+    }
+    throw json_exception("非 String 状态无法转换为 const string &.");
 }
 
 inline void json::push_back(const json &value) {
@@ -387,7 +416,7 @@ inline void json::change_type(decltype(t_) t) {
 }
 
 template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
-inline Int json::cast_int() {
+inline Int json::cast_int() const {
     if (t_ == INTEGRAL) {
         return i_;
     }
