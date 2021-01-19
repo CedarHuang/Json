@@ -1,5 +1,5 @@
-#ifndef __CEDAR_JSON_HPP__
-#define __CEDAR_JSON_HPP__
+#ifndef CEDAR_JSON_HPP_
+#define CEDAR_JSON_HPP_
 
 #include <cmath>
 #include <exception>
@@ -11,8 +11,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include "iterator_macro.h"
 
 namespace cedar {
 
@@ -96,18 +94,18 @@ struct json_object {
 };
 
 using J = struct json final {
-#define USING_(long_, short_, target_) \
-    using long_ = target_;             \
+#define CEDAR_JSON_USING_(long_, short_, target_) \
+    using long_ = target_;                        \
     using short_ = long_
 
-    USING_(null, N, json_null);
-    USING_(array, A, json_array);
-    USING_(object, O, json_object);
+    CEDAR_JSON_USING_(null, N, json_null);
+    CEDAR_JSON_USING_(array, A, json_array);
+    CEDAR_JSON_USING_(object, O, json_object);
 
-    USING_(integer, I, long long);
-    USING_(decimal, D, double);
-    USING_(string, S, std::string);
-#undef USING_
+    CEDAR_JSON_USING_(integer, I, long long);
+    CEDAR_JSON_USING_(decimal, D, double);
+    CEDAR_JSON_USING_(string, S, std::string);
+#undef CEDAR_JSON_USING_
 
     json();
 
@@ -168,7 +166,25 @@ using J = struct json final {
     using reverse_iterator = std::map<json_key, json>::reverse_iterator;
     using const_reverse_iterator = std::map<json_key, json>::const_reverse_iterator;
 
-    _ITERATOR(DECLARE)
+#define CEDAR_JSON_ITERATOR_(act)                                         \
+    CEDAR_JSON_ITERATOR_##act##_(iterator, begin, );                      \
+    CEDAR_JSON_ITERATOR_##act##_(const_iterator, begin, const);           \
+    CEDAR_JSON_ITERATOR_##act##_(const_iterator, cbegin, const);          \
+    CEDAR_JSON_ITERATOR_##act##_(iterator, end, );                        \
+    CEDAR_JSON_ITERATOR_##act##_(const_iterator, end, const);             \
+    CEDAR_JSON_ITERATOR_##act##_(const_iterator, cend, const);            \
+    CEDAR_JSON_ITERATOR_##act##_(reverse_iterator, rbegin, );             \
+    CEDAR_JSON_ITERATOR_##act##_(const_reverse_iterator, rbegin, const);  \
+    CEDAR_JSON_ITERATOR_##act##_(const_reverse_iterator, crbegin, const); \
+    CEDAR_JSON_ITERATOR_##act##_(reverse_iterator, rend, );               \
+    CEDAR_JSON_ITERATOR_##act##_(const_reverse_iterator, rend, const);    \
+    CEDAR_JSON_ITERATOR_##act##_(const_reverse_iterator, crend, const)
+
+#define CEDAR_JSON_ITERATOR_DECLARE_(type, name, limit) \
+    type name() limit
+
+    CEDAR_JSON_ITERATOR_(DECLARE);
+#undef CEDAR_JSON_ITERATOR_DECLARE_
 
     static json parse(const std::string &json_str);
 
@@ -235,5 +251,7 @@ struct json_parser final {
 #include "json_key.inc"
 #include "json_parser.inc"
 #include "json_utils.inc"
+
+#undef CEDAR_JSON_ITERATOR_
 
 #endif

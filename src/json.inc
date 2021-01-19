@@ -376,7 +376,16 @@ inline void json::fill_array(const json &sam) {
 
 inline void json::clear() { change_type(NONE); }
 
-_ITERATOR(DEFINE);
+#define CEDAR_JSON_ITERATOR_DEFINE_(type, name, limit)                            \
+    inline json::type json::name() limit {                                        \
+        if (t_ != ARRAY && t_ != OBJECT) {                                        \
+            throw json_exception("非 Array 或 Object 状态无法调用 " #name "()."); \
+        }                                                                         \
+        return m_.name();                                                         \
+    }
+
+CEDAR_JSON_ITERATOR_(DEFINE);
+#undef CEDAR_JSON_ITERATOR_DEFINE_
 
 inline json json::parse(const std::string &json_str) {
     return json_parser(json_str).do_it();
