@@ -31,12 +31,11 @@ using namespace std;
 using namespace cedar;
 
 int main() {
-    // json j;
-    J j;
+    json j;
     j["int"] = 1;
     cout << j << endl;
 
-    J j2;
+    json j2;
     j2[3] = 3;
     cout << j2 << ' ' << j2.size() << ' ' << j2.len() << endl;
     j2[5] = 5;

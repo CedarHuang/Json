@@ -20,6 +20,9 @@ struct json_exception final : std::runtime_error {
 };
 
 struct json_key final {
+    using integer = long long;
+    using string = std::string;
+
     template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type * = nullptr>
     json_key(Int i);
 
@@ -37,13 +40,27 @@ struct json_key final {
 
     bool operator<(const json_key &other) const;
 
-    operator std::string() const;
+    std::string dump() const;
 
-  private:
-    enum { NONE = 1,
-           INTEGER = 4,
-           STRING = 16
-    } t_;
+    template <class T, typename std::enable_if<std::is_lvalue_reference<T>::value && !std::is_const<typename std::remove_reference<T>::type>::value>::type * = nullptr>
+    T cast() = delete;
+
+    template <class T = std::string>
+    T cast() const;
+
+    enum class type {
+        null = 1,
+        integer = 4,
+        string = 16
+    };
+
+    type get_type() const;
+    bool is_null() const;
+    bool is_integer() const;
+    bool is_string() const;
+
+private:
+    type t_;
     union {
         long long i_;
         std::string s_;
@@ -53,7 +70,10 @@ struct json_key final {
 
     void destructor();
 
-    void change_type(decltype(t_) t);
+    void change_type(type t);
+
+    template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type * = nullptr>
+    Int cast_int() const;
 
     friend struct json;
     friend std::ostream &operator<<(std::ostream &out, const json_key &j);
@@ -88,19 +108,15 @@ struct json_object {
     data_type data_;
 };
 
-using J = struct json final {
-#define CEDAR_JSON_USING_(long_, short_, target_) \
-    using long_ = target_;                        \
-    using short_ = long_
+struct json final {
+    using null = json_null;
+    using array = json_array;
+    using object = json_object;
 
-    CEDAR_JSON_USING_(null, N, json_null);
-    CEDAR_JSON_USING_(array, A, json_array);
-    CEDAR_JSON_USING_(object, O, json_object);
-
-    CEDAR_JSON_USING_(integer, I, long long);
-    CEDAR_JSON_USING_(decimal, D, double);
-    CEDAR_JSON_USING_(string, S, std::string);
-#undef CEDAR_JSON_USING_
+    using boolean = long long;
+    using integer = long long;
+    using decimal = double;
+    using string = std::string;
 
     json();
 
@@ -133,7 +149,7 @@ using J = struct json final {
     json &at(const json_key &key);
     const json &at(const json_key &key) const;
 
-    operator std::string() const;
+    std::string dump() const;
 
     template <class T, typename std::enable_if<std::is_lvalue_reference<T>::value && !std::is_const<typename std::remove_reference<T>::type>::value>::type * = nullptr>
     T cast() = delete;
@@ -183,17 +199,27 @@ using J = struct json final {
 
     static json parse(const std::string &json_str);
 
-    enum {
-        NONE = 1,
-        BOOL = 2,
-        INTEGER = 4,
-        DECIMAL = 8,
-        STRING = 16,
-        ARRAY = 32,
-        OBJECT = 64
-    } t_;
+    enum class type {
+        null = 1,
+        boolean = 2,
+        integer = 4,
+        decimal = 8,
+        string = 16,
+        array = 32,
+        object = 64
+    };
+
+    type get_type() const;
+    bool is_null() const;
+    bool is_boolean() const;
+    bool is_integer() const;
+    bool is_decimal() const;
+    bool is_string() const;
+    bool is_array() const;
+    bool is_object() const;
 
   private:
+    type t_;
     union {
         integer i_;
         decimal d_;
@@ -205,7 +231,7 @@ using J = struct json final {
 
     void destructor();
 
-    void change_type(decltype(t_) t);
+    void change_type(type t);
 
     template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type * = nullptr>
     Int cast_int() const;
@@ -215,7 +241,7 @@ using J = struct json final {
 
 struct json_parser final {
   public:
-    json_parser(const std::string &s);
+    explicit json_parser(const std::string &s);
 
     ~json_parser() = default;
 

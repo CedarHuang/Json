@@ -33,36 +33,32 @@ using namespace std;
 using namespace cedar;
 
 int main() {
-    // json j;
-    J j;
+    json j;
     j["integer"] = 2;
     j["floating_point"] = 123.456;
     j["bool"] = true;
     j["string"] = "hello world";
-    // j["null"] = json::null();
-    j["null"] = J::N();
-    // j["array"] = json::array();
-    j["array"] = J::A();
-    // j["object"] = json::object();
-    j["object"] = J::O();
+    j["null"] = json::null();
+    j["array"] = json::array();
+    j["object"] = json::object();
     for (uint32_t i = 0; i < 5; ++i) {
         j["sequence"][i] = i;
     }
     j["object2"]["key"] = "value";
 
-    json j2 = J::O{
+    json j2 = json::object{
         {"integer", 2},
         {"floating_point", 123.456},
         {"bool", true},
         {"string", "hello world"},
-        {"null", J::N()},
-        {"array", J::A()},
-        {"object", J::O()},
-        {"sequence", J::A{0, 1, 2, 3, 4}},
-        {"object2", J::O{{"key", "value"}}},
+        {"null", json::null()},
+        {"array", json::array()},
+        {"object", json::object()},
+        {"sequence", json::array{0, 1, 2, 3, 4}},
+        {"object2", json::object{{"key", "value"}}},
     };
 
-    assert(j.operator string() == j2.operator string());
+    assert(j.dump() == j2.dump());
 
     return 0;
 }

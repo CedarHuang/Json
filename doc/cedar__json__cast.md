@@ -40,19 +40,15 @@ using namespace std;
 using namespace cedar;
 
 int main() {
-    // json j;
-    J j;
+    json j;
     j["int"] = 1;
     j["str"] = "ing";
 
-    // cout << j["int"].cast() << ' ' << j["str"].cast<const json::string&>() << endl;
-    cout << j["int"].cast() << ' ' << j["str"].cast<const J::S&>() << endl;
+    cout << j["int"].cast() << ' ' << j["str"].cast<const json::string&>() << endl;
 
-    // j["int"].cast<json::integer&>() = 2;
-    j["int"].cast<J::I&>() = 2;
+    j["int"].cast<json::integer&>() = 2;
 
-    // j["str"].cast<json::string&>().append("!~");
-    j["str"].cast<J::S&>().append("!~");
+    j["str"].cast<json::string&>().append("!~");
 
     cout << j << endl;
 

@@ -30,12 +30,11 @@ using namespace std;
 using namespace cedar;
 
 int main() {
-    // json j;
-    J j;
+    json j;
     j["int"] = 1;
     cout << j.at("int") << endl;
 
-    J j2;
+    json j2;
     j2[3] = 3;
     cout << j2.at(3) << endl;
 

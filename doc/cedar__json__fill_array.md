@@ -23,8 +23,7 @@ using namespace std;
 using namespace cedar;
 
 int main() {
-    // json j;
-    J j;
+    json j;
     j[3] = 3;
     cout << j << ' ' << j.size() << ' ' << j.len() << endl;
     j[5] = 5;
