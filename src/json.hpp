@@ -246,11 +246,11 @@ struct json_parser final {
 
 }  // namespace cedar
 
-#include "json.inc"
-#include "json_exception.inc"
-#include "json_key.inc"
-#include "json_parser.inc"
-#include "json_utils.inc"
+#include "json.inl"
+#include "json_exception.inl"
+#include "json_key.inl"
+#include "json_parser.inl"
+#include "json_utils.inl"
 
 #undef CEDAR_JSON_ITERATOR_
 
