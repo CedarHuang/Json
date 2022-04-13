@@ -1,7 +1,11 @@
 .DS_Store
+.vscode
+.idea
 *.gch
 *.cpp
 *.o
 *.json
 a.out
 a.exe
+CMakeLists.txt
+cmake-build-debug

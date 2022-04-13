@@ -14,14 +14,9 @@
 
 namespace cedar {
 
-struct json_exception final : std::exception {
-    explicit json_exception(const std::string &info);
-    explicit json_exception(std::string &&info);
-    virtual ~json_exception() override;
-    virtual const char *what() const noexcept override;
-
-  private:
-    std::string info_;
+struct json_exception final : std::runtime_error {
+  explicit json_exception(const char *info) : std::runtime_error(info) {}
+  explicit json_exception(const std::string &info) : std::runtime_error(info) {}
 };
 
 struct json_key final {
@@ -33,12 +28,12 @@ struct json_key final {
     json_key(std::string &&s);
 
     json_key(const json_key &other);
-    json_key(json_key &&other);
+    json_key(json_key &&other) noexcept;
 
     ~json_key();
 
     json_key &operator=(const json_key &other);
-    json_key &operator=(json_key &&other);
+    json_key &operator=(json_key &&other) noexcept;
 
     bool operator<(const json_key &other) const;
 
@@ -126,12 +121,12 @@ using J = struct json final {
     json(const object &o);
 
     json(const json &other);
-    json(json &&other);
+    json(json &&other) noexcept;
 
     ~json();
 
     json &operator=(const json &other);
-    json &operator=(json &&other);
+    json &operator=(json &&other) noexcept;
 
     json &operator[](const json_key &key);
 
@@ -188,7 +183,6 @@ using J = struct json final {
 
     static json parse(const std::string &json_str);
 
-  private:
     enum {
         NONE = 1,
         BOOL = 2,
@@ -198,6 +192,8 @@ using J = struct json final {
         ARRAY = 32,
         OBJECT = 64
     } t_;
+
+  private:
     union {
         integer i_;
         decimal d_;
@@ -247,7 +243,6 @@ struct json_parser final {
 }  // namespace cedar
 
 #include "json.inl"
-#include "json_exception.inl"
 #include "json_key.inl"
 #include "json_parser.inl"
 #include "json_utils.inl"

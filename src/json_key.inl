@@ -8,7 +8,7 @@ inline json_key::json_key(const std::string &s) : t_(STRING) { new (&s_) std::st
 inline json_key::json_key(std::string &&s) : t_(STRING) { new (&s_) std::string(std::move(s)); }
 
 inline json_key::json_key(const json_key &other) : t_(NONE) { *this = other; }
-inline json_key::json_key(json_key &&other) : t_(NONE) { *this = std::move(other); }
+inline json_key::json_key(json_key &&other) noexcept : t_(NONE) { *this = std::move(other); }
 
 inline json_key::~json_key() { destructor(); }
 
@@ -27,7 +27,7 @@ inline json_key &json_key::operator=(const json_key &other) {
     }
     return *this;
 }
-inline json_key &json_key::operator=(json_key &&other) {
+inline json_key &json_key::operator=(json_key &&other) noexcept {
     change_type(other.t_);
     switch (t_) {
         case INTEGER:

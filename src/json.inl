@@ -29,7 +29,7 @@ inline json::json(const object &o) : t_(OBJECT) {
 }
 
 inline json::json(const json &other) : t_(NONE) { *this = other; }
-inline json::json(json &&other) : t_(NONE) { *this = std::move(other); }
+inline json::json(json &&other) noexcept : t_(NONE) { *this = std::move(other); }
 
 inline json::~json() { destructor(); }
 
@@ -58,7 +58,7 @@ inline json &json::operator=(const json &other) {
     }
     return *this;
 }
-inline json &json::operator=(json &&other) {
+inline json &json::operator=(json &&other) noexcept {
     change_type(other.t_);
     switch (t_) {
         case BOOL:
