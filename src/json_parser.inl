@@ -69,7 +69,7 @@ inline json json_parser::parse_array(size_t begin, size_t end) {
     if (legal) {
         return j;
     }
-    throw json_exception("不是合法的 Json.");
+    THROW_ILLEGAL_JSON;
 }
 
 inline json json_parser::parse_object(size_t begin, size_t end) {
@@ -122,7 +122,7 @@ inline json json_parser::parse_object(size_t begin, size_t end) {
     if (legal) {
         return j;
     }
-    throw json_exception("不是合法的 Json.");
+    THROW_ILLEGAL_JSON;
 }
 
 inline size_t json_parser::find_first_punctuation(char punctuation, size_t begin, size_t end) {

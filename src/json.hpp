@@ -14,11 +14,6 @@
 
 namespace cedar {
 
-struct json_exception final : std::runtime_error {
-  explicit json_exception(const char *info) : std::runtime_error(info) {}
-  explicit json_exception(const std::string &info) : std::runtime_error(info) {}
-};
-
 struct json_key final {
     using integer = long long;
     using string = std::string;
@@ -218,6 +213,20 @@ struct json final {
     bool is_array() const;
     bool is_object() const;
 
+    bool get_boolean() const;
+    integer get_integer() const;
+    decimal get_decimal() const;
+    string get_string() const;
+
+    bool &ref_boolean();
+    const bool &ref_boolean() const;
+    integer &ref_integer();
+    const integer &ref_integer() const;
+    decimal &ref_decimal();
+    const decimal &ref_decimal() const;
+    string &ref_string();
+    const string &ref_string() const;
+
   private:
     type t_;
     union {
@@ -266,13 +275,32 @@ struct json_parser final {
     friend json;
 };
 
+struct json_exception final : std::runtime_error {
+    explicit json_exception(const char *info);
+    explicit json_exception(const std::string &info);
+
+    static json_exception cannot_call(const char *func, json::type type);
+    static json_exception cannot_use_key(const char *func, json::type json_type, json_key::type key_type);
+
+#define THROW_CANNOT_CALL_ throw json_exception::cannot_call(__FUNCTION__, static_cast<json::type>(get_type()))
+#define THROW_CANNOT_USE_KEY_(key) throw json_exception::cannot_use_key(__FUNCTION__, get_type(), key.get_type())
+#define THROW_ILLEGAL_JSON throw json_exception("Illegal Json.")
+
+  private:
+    static std::string type_name(json::type type);
+};
+
 }  // namespace cedar
 
 #include "json.inl"
+#include "json_exception.inl"
 #include "json_key.inl"
 #include "json_parser.inl"
 #include "json_utils.inl"
 
 #undef CEDAR_JSON_ITERATOR_
+#undef THROW_CANNOT_CALL_
+#undef THROW_CANNOT_USE_KEY_
+#undef THROW_ILLEGAL_JSON
 
 #endif

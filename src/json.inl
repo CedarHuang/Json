@@ -1,6 +1,3 @@
-
-#include "json.hpp"
-
 namespace cedar {
 
 inline json::json() : t_(type::null) {}
@@ -96,53 +93,53 @@ inline json &json::operator[](const json_key &key) {
     switch (t_) {
         case type::array:
             if (!key.is_integer()) {
-                throw json_exception("Array 状态下只能使用整数型 json_key.");
+                THROW_CANNOT_USE_KEY_(key);
             }
             return m_[key];
         case type::object:
             if (!key.is_string()) {
-                throw json_exception("Object 状态下只能使用字符串型 json_key.");
+                THROW_CANNOT_USE_KEY_(key);
             }
             return m_[key];
 
         default:;
     }
-    throw json_exception("非 Array 或 Object 状态无法使用 operator[].");
+    THROW_CANNOT_CALL_;
 }
 
 inline json &json::at(const json_key &key) {
     switch (t_) {
         case type::array:
             if (!key.is_integer()) {
-                throw json_exception("Array 状态下只能使用整数型 json_key.");
+                THROW_CANNOT_USE_KEY_(key);
             }
             return m_.at(key);
         case type::object:
             if (!key.is_string()) {
-                throw json_exception("Object 状态下只能使用字符串型 json_key.");
+                THROW_CANNOT_USE_KEY_(key);
             }
             return m_.at(key);
 
         default:;
     }
-    throw json_exception("非 Array 或 Object 状态无法使用 at().");
+    THROW_CANNOT_CALL_;
 }
 inline const json &json::at(const json_key &key) const {
     switch (t_) {
         case type::array:
             if (!key.is_integer()) {
-                throw json_exception("Array 状态下只能使用整数型 json_key.");
+                THROW_CANNOT_USE_KEY_(key);
             }
             return m_.at(key);
         case type::object:
             if (!key.is_string()) {
-                throw json_exception("Object 状态下只能使用字符串型 json_key.");
+                THROW_CANNOT_USE_KEY_(key);
             }
             return m_.at(key);
 
         default:;
     }
-    throw json_exception("非 Array 或 Object 状态无法使用 at().");
+    THROW_CANNOT_CALL_;
 }
 
 inline std::string json::dump() const {
@@ -228,21 +225,21 @@ inline json::integer &json::cast<json::integer &>() {
     if (is_integer()) {
         return i_;
     }
-    throw json_exception("非 Integer 状态无法转换为 integer &.");
+    THROW_CANNOT_CALL_;
 }
 template <>
 inline json::decimal &json::cast<json::decimal &>() {
     if (is_decimal()) {
         return d_;
     }
-    throw json_exception("非 Decimal 状态无法转换为 decimal &.");
+    THROW_CANNOT_CALL_;
 }
 template <>
 inline json::string &json::cast<json::string &>() {
     if (is_string()) {
         return s_;
     }
-    throw json_exception("非 String 状态无法转换为 string &.");
+    THROW_CANNOT_CALL_;
 }
 
 template <class T>
@@ -254,21 +251,21 @@ inline bool json::cast<bool>() const {
     if (is_boolean()) {
         return i_;
     }
-    throw json_exception("非 Bool 状态无法转换为 bool.");
+    THROW_CANNOT_CALL_;
 }
 template <>
 inline float json::cast<float>() const {
     if (is_decimal()) {
         return static_cast<float>(d_);
     }
-    throw json_exception("非 Decimal 状态无法转换为 float.");
+    THROW_CANNOT_CALL_;
 }
 template <>
 inline double json::cast<double>() const {
     if (is_decimal()) {
         return d_;
     }
-    throw json_exception("非 Decimal 状态无法转换为 double.");
+    THROW_CANNOT_CALL_;
 }
 template <>
 inline std::string json::cast<std::string>() const {
@@ -283,7 +280,7 @@ inline const std::string &json::cast<const std::string &>() const {
     if (is_string()) {
         return s_;
     }
-    throw json_exception("非 String 状态无法转换为 const string &.");
+    THROW_CANNOT_CALL_;
 }
 
 inline void json::push_back(const json &value) {
@@ -292,7 +289,7 @@ inline void json::push_back(const json &value) {
         constructor();
     }
     if (!is_array()) {
-        throw json_exception("非 Array 状态无法使用 push_back.");
+        THROW_CANNOT_CALL_;
     }
     m_[len()] = value;
 }
@@ -302,20 +299,20 @@ inline void json::push_back(json &&value) {
         constructor();
     }
     if (!is_array()) {
-        throw json_exception("非 Array 状态无法使用 push_back.");
+        THROW_CANNOT_CALL_;
     }
     m_[len()] = std::move(value);
 }
 
 inline json &json::back() {
     if (!is_array()) {
-        throw json_exception("非 Array 状态无法使用 back.");
+        THROW_CANNOT_CALL_;
     }
     return (*--m_.end()).second;
 }
 inline const json &json::back() const {
     if (!is_array()) {
-        throw json_exception("非 Array 状态无法使用 back.");
+        THROW_CANNOT_CALL_;
     }
     return (*--m_.cend()).second;
 }
@@ -324,8 +321,7 @@ inline void json::erase(const json_key &key) {
     switch (t_) {
         case type::array:
             if (!key.is_integer()) {
-                throw json_exception(
-                    "Array 状态下只能使用整数型 json_key.");
+                THROW_CANNOT_USE_KEY_(key);
             }
         case type::object:
             m_.erase(key);
@@ -333,7 +329,7 @@ inline void json::erase(const json_key &key) {
 
         default:;
     }
-    throw json_exception("非 Array 或 Object 状态无法使用 erase().");
+    THROW_CANNOT_CALL_;
 }
 
 inline size_t json::size() const {
@@ -347,7 +343,7 @@ inline size_t json::size() const {
 
         default:;
     }
-    throw json_exception("非 String 或 Array 或 Object 状态无法使用 size().");
+    THROW_CANNOT_CALL_;
 }
 inline size_t json::len() const {
     switch (t_) {
@@ -362,12 +358,12 @@ inline size_t json::len() const {
 
         default:;
     }
-    throw json_exception("非 String 或 Array 或 Object 状态无法使用 len().");
+    THROW_CANNOT_CALL_;
 }
 
 inline void json::fill_array(const json &sam) {
     if (!is_array()) {
-        throw json_exception("非 Array 状态无法使用 fill_array.");
+        THROW_CANNOT_CALL_;
     }
     long long index = 0;
     for (auto iter = m_.begin(); iter != m_.end(); ++iter, ++index) {
@@ -382,7 +378,7 @@ inline void json::clear() { change_type(type::null); }
 #define CEDAR_JSON_ITERATOR_DEFINE_(iter_type, name, limit)                    \
     inline json::iter_type json::name() limit {                                \
         if (!is_array() && !is_object()) {                         \
-            throw json_exception("非 Array 或 Object 状态无法调用 " #name "()."); \
+            THROW_CANNOT_CALL_; \
         }                                                                      \
         return m_.name();                                                      \
     }
@@ -402,6 +398,28 @@ inline bool json::is_decimal() const { return t_ == type::decimal; }
 inline bool json::is_string() const { return t_ == type::string; }
 inline bool json::is_array() const { return t_ == type::array; }
 inline bool json::is_object() const { return t_ == type::object; }
+
+#define CEDAR_JSON_IF_RETURN_(_type, ret) \
+    if (!is_##_type()) {                  \
+        THROW_CANNOT_CALL_;               \
+    }                                     \
+    return ret
+
+inline bool json::get_boolean() const { CEDAR_JSON_IF_RETURN_(boolean, i_); }
+inline json::integer json::get_integer() const { CEDAR_JSON_IF_RETURN_(integer, i_); }
+inline json::decimal json::get_decimal() const { CEDAR_JSON_IF_RETURN_(decimal, d_); }
+inline json::string json::get_string() const { CEDAR_JSON_IF_RETURN_(string, s_); }
+
+inline bool &json::ref_boolean() { CEDAR_JSON_IF_RETURN_(boolean, reinterpret_cast<bool &>(i_)); }
+inline const bool &json::ref_boolean() const { CEDAR_JSON_IF_RETURN_(boolean, reinterpret_cast<const bool &>(i_)); }
+inline json::integer &json::ref_integer() { CEDAR_JSON_IF_RETURN_(integer, i_); }
+inline const json::integer &json::ref_integer() const { CEDAR_JSON_IF_RETURN_(integer, i_); }
+inline json::decimal &json::ref_decimal() { CEDAR_JSON_IF_RETURN_(decimal, d_); }
+inline const json::decimal &json::ref_decimal() const { CEDAR_JSON_IF_RETURN_(decimal, d_); }
+inline json::string &json::ref_string() { CEDAR_JSON_IF_RETURN_(string, s_); }
+inline const json::string &json::ref_string() const { CEDAR_JSON_IF_RETURN_(string, s_); }
+
+#undef CEDAR_JSON_IF_RETURN_
 
 inline void json::constructor() {
     switch (t_) {
@@ -447,7 +465,7 @@ inline Int json::cast_int() const {
     if (is_integer()) {
         return i_;
     }
-    throw json_exception("非 Integer 状态无法转换.");
+    THROW_CANNOT_CALL_;
 }
 
 inline std::ostream &operator<<(std::ostream &out, const json &j) {

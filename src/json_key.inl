@@ -76,14 +76,14 @@ inline json_key::integer &json_key::cast<json_key::integer &>() {
     if (is_integer()) {
         return i_;
     }
-    throw json_exception("非 Integer 状态无法转换为 integer &.");
+    THROW_CANNOT_CALL_;
 }
 template <>
 inline json_key::string &json_key::cast<json_key::string &>() {
     if (is_string()) {
         return s_;
     }
-    throw json_exception("非 String 状态无法转换为 string &.");
+    THROW_CANNOT_CALL_;
 }
 
 template <class T>
@@ -103,7 +103,7 @@ inline const std::string &json_key::cast<const std::string &>() const {
     if (is_string()) {
         return s_;
     }
-    throw json_exception("非 String 状态无法转换为 const string &.");
+    THROW_CANNOT_CALL_;
 }
 
 inline json_key::type json_key::get_type() const { return t_; }
@@ -137,7 +137,7 @@ inline Int json_key::cast_int() const {
     if (is_integer()) {
         return i_;
     }
-    throw json_exception("非 Integer 状态无法转换.");
+    THROW_CANNOT_CALL_;
 }
 
 inline std::ostream &operator<<(std::ostream &out, const json_key &j) {
