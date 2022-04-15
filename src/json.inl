@@ -220,69 +220,6 @@ inline std::string json::dump() const {
     return s;
 }
 
-template <>
-inline json::integer &json::cast<json::integer &>() {
-    if (is_integer()) {
-        return i_;
-    }
-    THROW_CANNOT_CALL_;
-}
-template <>
-inline json::decimal &json::cast<json::decimal &>() {
-    if (is_decimal()) {
-        return d_;
-    }
-    THROW_CANNOT_CALL_;
-}
-template <>
-inline json::string &json::cast<json::string &>() {
-    if (is_string()) {
-        return s_;
-    }
-    THROW_CANNOT_CALL_;
-}
-
-template <class T>
-inline T json::cast() const {
-    return cast_int<T>();
-}
-template <>
-inline bool json::cast<bool>() const {
-    if (is_boolean()) {
-        return i_;
-    }
-    THROW_CANNOT_CALL_;
-}
-template <>
-inline float json::cast<float>() const {
-    if (is_decimal()) {
-        return static_cast<float>(d_);
-    }
-    THROW_CANNOT_CALL_;
-}
-template <>
-inline double json::cast<double>() const {
-    if (is_decimal()) {
-        return d_;
-    }
-    THROW_CANNOT_CALL_;
-}
-template <>
-inline std::string json::cast<std::string>() const {
-    if (is_string()) {
-        return s_;
-    } else {
-        return dump();
-    }
-}
-template <>
-inline const std::string &json::cast<const std::string &>() const {
-    if (is_string()) {
-        return s_;
-    }
-    THROW_CANNOT_CALL_;
-}
-
 inline void json::push_back(const json &value) {
     if (is_null()) {
         t_ = type::array;
@@ -419,6 +356,93 @@ inline const json::decimal &json::ref_decimal() const { CEDAR_JSON_IF_RETURN_(de
 inline json::string &json::ref_string() { CEDAR_JSON_IF_RETURN_(string, s_); }
 inline const json::string &json::ref_string() const { CEDAR_JSON_IF_RETURN_(string, s_); }
 
+template <>
+inline bool &json::cast<bool &>() { CEDAR_JSON_IF_RETURN_(boolean, reinterpret_cast<bool &>(i_)); }
+template <>
+inline json::integer &json::cast<json::integer &>() { CEDAR_JSON_IF_RETURN_(integer, i_); }
+template <>
+inline json::decimal &json::cast<json::decimal &>() { CEDAR_JSON_IF_RETURN_(decimal, d_); }
+template <>
+inline json::string &json::cast<json::string &>() { CEDAR_JSON_IF_RETURN_(string, s_); }
+template <>
+inline const std::string &json::cast<const std::string &>() const { CEDAR_JSON_IF_RETURN_(string, s_); }
+
+template <class T>
+inline T json::cast() const { return cast_int<T>(); }
+template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
+inline Int json::cast_int() const {
+    switch (t_) {
+        case type::null:
+            return 0;
+
+        case type::boolean:
+        case type::integer:
+            return i_;
+
+        case type::decimal:
+            return d_;
+
+        default:;
+    }
+    THROW_CANNOT_CALL_;
+}
+template <>
+inline bool json::cast<bool>() const {
+    switch (t_) {
+        case type::null:
+            return false;
+
+        case type::boolean:
+        case type::integer:
+            return i_;
+
+        default:;
+    }
+    THROW_CANNOT_CALL_;
+}
+template <>
+inline float json::cast<float>() const {
+    switch (t_) {
+        case type::null:
+            return 0;
+
+        case type::boolean:
+        case type::integer:
+            return static_cast<float>(i_);
+
+        case type::decimal:
+            return static_cast<float>(d_);
+
+        default:;
+    }
+    THROW_CANNOT_CALL_;
+}
+template <>
+inline double json::cast<double>() const {
+    switch (t_) {
+        case type::null:
+            return 0;
+
+        case type::boolean:
+        case type::integer:
+            return static_cast<double>(i_);
+
+        case type::decimal:
+            return d_;
+
+        default:;
+    }
+    THROW_CANNOT_CALL_;
+}
+template <>
+inline std::string json::cast<std::string>() const {
+    if (is_string()) {
+        return s_;
+    } else {
+        return dump();
+    }
+}
+
 #undef CEDAR_JSON_IF_RETURN_
 
 inline void json::constructor() {
@@ -458,14 +482,6 @@ inline void json::change_type(type t) {
     destructor();
     t_ = t;
     constructor();
-}
-
-template <class Int, typename std::enable_if<std::is_integral<Int>::value>::type *>
-inline Int json::cast_int() const {
-    if (is_integer()) {
-        return i_;
-    }
-    THROW_CANNOT_CALL_;
 }
 
 inline std::ostream &operator<<(std::ostream &out, const json &j) {

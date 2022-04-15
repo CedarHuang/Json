@@ -34,14 +34,9 @@ struct json_key final {
     json_key &operator=(json_key &&other) noexcept;
 
     bool operator<(const json_key &other) const;
+    bool operator==(const json_key &other) const;
 
     std::string dump() const;
-
-    template <class T, typename std::enable_if<std::is_lvalue_reference<T>::value && !std::is_const<typename std::remove_reference<T>::type>::value>::type * = nullptr>
-    T cast() = delete;
-
-    template <class T = std::string>
-    T cast() const;
 
     enum class type {
         null = 1,
@@ -54,7 +49,20 @@ struct json_key final {
     bool is_integer() const;
     bool is_string() const;
 
-private:
+    integer get_integer() const;
+    string get_string() const;
+
+    integer &ref_integer();
+    const integer &ref_integer() const;
+    string &ref_string();
+    const string &ref_string() const;
+
+    template <class T, typename std::enable_if<std::is_lvalue_reference<T>::value && !std::is_const<typename std::remove_reference<T>::type>::value>::type * = nullptr>
+    T cast() = delete;
+    template <class T = std::string>
+    T cast() const;
+
+  private:
     type t_;
     union {
         long long i_;
@@ -146,12 +154,6 @@ struct json final {
 
     std::string dump() const;
 
-    template <class T, typename std::enable_if<std::is_lvalue_reference<T>::value && !std::is_const<typename std::remove_reference<T>::type>::value>::type * = nullptr>
-    T cast() = delete;
-
-    template <class T = std::string>
-    T cast() const;
-
     void push_back(const json &value);
     void push_back(json &&value);
 
@@ -226,6 +228,11 @@ struct json final {
     const decimal &ref_decimal() const;
     string &ref_string();
     const string &ref_string() const;
+
+    template <class T, typename std::enable_if<std::is_lvalue_reference<T>::value && !std::is_const<typename std::remove_reference<T>::type>::value>::type * = nullptr>
+    T cast() = delete;
+    template <class T = std::string>
+    T cast() const;
 
   private:
     type t_;
